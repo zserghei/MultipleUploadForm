@@ -1,0 +1,79 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script type="text/javascript">
+	$(document).ready(
+
+		function() {
+
+			$('.upload-form').on('click', '.attachment-delete', function(event) {
+				event.preventDefault();
+				$(this).closest('.attachment').remove();
+			}).on(
+				'click',
+				'.add-attachment',
+				function(event) {
+					event.preventDefault();
+					$(this).closest('.upload-form').find('.attachments').append(
+						'<div class="attachment">' + '<input type="file" name="attachment[]" class="upload-form-input attachment-file" />'
+							+ '<label for="attachment-info">Description:</label>'
+							+ '<input type="text" name="attachment-info[]" class="upload-form-input attachment-info" />'
+							+ '<a href="#" class="attachment-delete" title="Delete attachment">×</a>' + '</div>');
+				}).on('click', '.submit', function(event) {
+				event.preventDefault();
+				if ($(this).closest('.upload-form').find('.attachment-file').size() > 0) {
+					$(this).closest('.upload-form').submit();
+				} else {
+					uploadComplete($(this).closest('.upload-form').attr('name'));
+				}
+			});
+
+		});
+
+	function uploadComplete(formName, data) {
+		try {
+			var res = null;
+			if (data) {
+				var res = JSON.parse(data);
+			}
+			if (res && res.error) {
+				return sendFailed(res.error.message);
+			} else {
+				sendSuccess(data);
+			}
+		} catch (e) {
+			return sendFailed(e);
+		}
+	}
+
+	function sendFailed(message) {
+		alert("Failed: " + message);
+	}
+
+	function sendSuccess(message) {
+		alert("Success: " + message);
+	}
+</script>
+</head>
+<body>
+
+	<form id="upload-form" name="upload-form" class="upload-form" method="post" enctype="multipart/form-data" target="upload-target"
+		action="upload.php?func=uploadFiles">
+		<input type="hidden" name="upload-form-name" id="upload-form-name" value="upload-form" />
+		<div class='upload-form-row'>
+			<a href='#' class='add-attachment'>Add attachment</a>
+		</div>
+		<div class='upload-form-row attachments'></div>
+		<div class='upload-form-row'>
+			<a class='submit' href='#'>Submit</a>
+		</div>
+
+		<iframe id="upload-target" name="upload-target" src="#" style="width: 0; height: 0; border: 0px solid #fff;"></iframe>
+	</form>
+
+</body>
+</html>
